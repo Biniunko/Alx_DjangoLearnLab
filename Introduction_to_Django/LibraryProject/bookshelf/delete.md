@@ -1,4 +1,5 @@
 # Delete the book instance in python code
+from bookshelf.models import Book
 book.delete()
 
 # Confirm deletion
