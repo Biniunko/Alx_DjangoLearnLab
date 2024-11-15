@@ -19,6 +19,20 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+# views.py
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import UserProfile
+
+# Check if the user is a Librarian
+def is_librarian(user):
+    return user.userprofile.role == 'Librarian'
+
+# Librarian view - accessible only by Librarians
+@login_required
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    return render(request, 'librarian_view.html')
 
 # User Registration View
 def register(request):
