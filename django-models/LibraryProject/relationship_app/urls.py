@@ -9,7 +9,7 @@ urlpatterns = [
 ]
 # urls.py
 
-
+LogoutView.as_view(template_name=", "LoginView.as_view(template_name=
 urlpatterns = [
     path("login/", views.user_login, name="login"),
     path("logout/", views.user_logout, name="logout"),
