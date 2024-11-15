@@ -2,26 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport meta tag added -->
     <title>List of Books</title>
 </head>
 <body>
     <h1>Books Available:</h1>
     <ul>
-        {% if books %}
-            {% for book in books %}
-                <li>
-                    {{ book.title }} 
-                    {% if book.author %}
-                        by {{ book.author.name }}
-                    {% else %}
-                        by Unknown Author
-                    {% endif %}
-                </li>
-            {% endfor %}
-        {% else %}
-            <li>No books available.</li>
-        {% endif %}
+        {% for book in books %}
+        <li>{{ book.title }} by {{ book.author.name }}</li>
+        {% endfor %}
     </ul>
 </body>
 </html>
