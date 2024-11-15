@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport meta tag added -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +9,7 @@
     <h2>Books in Library:</h2>
     <ul>
         {% for book in library.books.all %}
-        <li>{{ book.title }} by {{ book.author.name }}</li>
+        <li>{{ book.title }} by {{ book.author.name }} (Published {{ book.publication_year }})</li>
         {% endfor %}
     </ul>
 </body>
