@@ -166,3 +166,12 @@ SECURE_HSTS_PRELOAD = True  # Allow preloading in browsers for HSTS
 # Secure cookies
 SESSION_COOKIE_SECURE = True  # Ensure session cookies are only sent over HTTPS
 CSRF_COOKIE_SECURE = True  # Ensure CSRF cookies are only sent over HTTPS
+
+# Prevent MIME type sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Enable the browser's XSS filtering
+SECURE_BROWSER_XSS_FILTER = True
+
+# Prevent clickjacking
+X_FRAME_OPTIONS = 'DENY'
