@@ -175,3 +175,11 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # Prevent clickjacking
 X_FRAME_OPTIONS = 'DENY'
+
+# Enforce HTTPS by redirecting HTTP requests
+SECURE_SSL_REDIRECT = True
+
+# HTTP Strict Transport Security (HSTS) configuration
+SECURE_HSTS_SECONDS = 31536000  # Instruct browsers to only access via HTTPS for one year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Include all subdomains in HSTS policy
+SECURE_HSTS_PRELOAD = True  # Enable preloading of HSTS policy in browsers
