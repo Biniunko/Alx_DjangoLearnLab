@@ -3,6 +3,7 @@ from django.views.generic.detail import DetailView
 from .models import Book
 from django.contrib.auth.decorators import permission_required
 from .models import Library
+from django.contrib.auth import login
 # Function-based view to list all books
 def list_books(request):
     # Using Book.objects.all() to fetch all book entries
