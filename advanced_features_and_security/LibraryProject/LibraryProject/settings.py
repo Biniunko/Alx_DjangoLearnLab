@@ -129,3 +129,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
+
+import os
+
+# Ensure DEBUG is False in production
+DEBUG = False
+
+# Secure settings
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Cookies must be sent over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Ensure a secure secret key for production
+SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-development-key')
+
+# Restrict allowed hosts
+ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+
+# Content Security Policy (CSP) Header (requires django-csp or manual middleware)
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
