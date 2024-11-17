@@ -4,6 +4,7 @@ from .models import Book
 from django.contrib.auth.decorators import permission_required
 from .models import Library
 from django.contrib.auth import login
+from django.contrib import messages
 # Function-based view to list all books
 def list_books(request):
     # Using Book.objects.all() to fetch all book entries
@@ -174,3 +175,17 @@ def delete_book(request, book_id):
         book.delete()
         return redirect('book_list')  # Redirect to the book list
     return render(request, 'relationship_app/delete_book.html', {'book': book})
+
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f"Account created for {username}! You can now log in.")
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'relationship_app/register.html', {'form': form})
