@@ -18,7 +18,11 @@ class BookAPITests(APITestCase):
         self.client = APIClient()
         self.book_list_url = reverse('book-list')
         self.book_detail_url = reverse('book-detail', kwargs={'pk': self.book.pk})
+         # Set up API client
+        self.client = APIClient()
 
+        # Authenticate the test user
+        self.client.login(username="testuser", password="testpassword")
     def test_list_books(self):
         """Test retrieving the list of books."""
         response = self.client.get(self.book_list_url)
@@ -68,3 +72,4 @@ class BookAPITests(APITestCase):
         # The database should start empty except for objects created in setUp
         self.assertEqual(User.objects.count(), 1)  # Only test user exists
         self.assertEqual(Book.objects.count(), 1)  # Only one book exists
+    
