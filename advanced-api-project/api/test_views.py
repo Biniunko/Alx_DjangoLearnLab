@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from .models import Author, Book
-
+from django.contrib.auth.models import User
 
 class BookAPITests(APITestCase):
     """Test suite for Book model API endpoints."""
@@ -63,3 +63,8 @@ class BookAPITests(APITestCase):
     def test_filter_books_by_author(self):
         """Test filtering books by author name."""
         response = self.cli
+     def test_test_database_is_used(self):
+        """Verify that tests use a separate database."""
+        # The database should start empty except for objects created in setUp
+        self.assertEqual(User.objects.count(), 1)  # Only test user exists
+        self.assertEqual(Book.objects.count(), 1)  # Only one book exists
