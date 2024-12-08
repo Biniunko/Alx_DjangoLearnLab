@@ -22,7 +22,7 @@ urlpatterns = [
     path(
         "posts/<int:pk>/", PostDetailView.as_view(), name="post-detail"
     ),  # View individual post details
-    path("posts/new/", PostCreateView.as_view(), name="post-create"),  # Create new post
+ 
     
     path('post/new/', views.create_post, name='create_post'),  # For creating a new post
     path('post/<int:pk>/update/', views.update_post, name='update_post'),  # For updating an existing post
