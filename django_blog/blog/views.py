@@ -1,29 +1,17 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from django.views.generic import (
-    ListView,
-    DetailView,
-    CreateView,
-    UpdateView,
-    DeleteView,
-)
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Post
-from django.http import Http404
-from .models import Comment
-from .forms import CommentForm
-from .models import Tag
-from .forms import PostForm
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .models import Post, Tag, Comment
 from django.db.models import Q
-
+from django.http import Http404
 
 # User Registration View
 def register(request):
@@ -95,37 +83,48 @@ class PostDetailView(DetailView):
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = "blog/post_form.html"
-    fields = ["title", "content"]
+    fields = ["title", "content", "tags"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        # Handle tag creation if they are not in the database
+        tags = form.cleaned_data["tags"]
+        for tag in tags:
+            if not Tag.objects.filter(name=tag).exists():
+                Tag.objects.create(name=tag)
+
+        return response
 
 
 # Update view to edit a post (only the author can edit)
-class PostUpdateView(LoginRequiredMixin, UpdateView):
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
+    form_class = PostForm
     template_name = "blog/post_form.html"
-    fields = ["title", "content"]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(author=self.request.user)
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author  # Only the author can edit
+
+    def get_success_url(self):
+        return reverse_lazy("post_detail", kwargs={"pk": self.object.pk})
 
 
 # Delete view to delete a post (only the author can delete)
-class PostDeleteView(LoginRequiredMixin, DeleteView):
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = "blog/post_confirm_delete.html"
-    success_url = reverse_lazy("post-list")
+    success_url = reverse_lazy("post_list")
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(author=self.request.user)
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author  # Only the author can delete
 
 
 def home(request):
-    posts = Post.objects.all()  # or any other logic to get posts
+    posts = Post.objects.all()
     return render(request, "blog/home.html", {"posts": posts})
 
 
@@ -188,7 +187,7 @@ def create_post(request):
         if form.is_valid():
             post = form.save()
 
-            # Handling tag creation if they are not in the database
+            # Handle tag creation if they are not in the database
             tags = form.cleaned_data["tags"]
             for tag in tags:
                 if not Tag.objects.filter(name=tag).exists():
