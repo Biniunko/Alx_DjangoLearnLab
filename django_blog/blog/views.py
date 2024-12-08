@@ -6,12 +6,19 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from .forms import CustomUserCreationForm, PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Tag, Comment
 from django.db.models import Q
 from django.http import Http404
+
 
 # User Registration View
 def register(request):
@@ -64,7 +71,15 @@ def profile(request):
         messages.success(request, "Profile updated successfully.")
     return render(request, "blog/profile.html")
 
-
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/post_list_by_tag.html'  # Template for rendering posts by tag
+    context_object_name = 'posts'
+    
+    def get_queryset(self):
+        tag_slug = self.kwargs.get('tag_slug')  # Get tag slug from URL
+        tag = get_object_or_404(Tag, slug=tag_slug)  # Fetch the tag by slug
+        return Post.objects.filter(tags=tag)
 # List view to display all posts
 class PostListView(ListView):
     model = Post
@@ -219,10 +234,14 @@ def posts_by_tag(request, tag_name):
     return render(
         request, "blog/posts_by_tag.html", {"posts": posts, "tag_name": tag_name}
     )
+
+
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
-    template_name = "blog/comment_form.html"  # This is a separate template for comment creation
+    template_name = (
+        "blog/comment_form.html"  # This is a separate template for comment creation
+    )
 
     def form_valid(self, form):
         post = get_object_or_404(Post, pk=self.kwargs["pk"])  # Post ID passed in URL
@@ -238,7 +257,9 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
-    template_name = "blog/comment_form.html"  # Use the same form template as create view
+    template_name = (
+        "blog/comment_form.html"  # Use the same form template as create view
+    )
 
     def test_func(self):
         comment = self.get_object()
@@ -251,7 +272,9 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 # Delete view to delete a comment (only the author can delete)
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
-    template_name = "blog/comment_confirm_delete.html"  # A confirmation page for deleting comments
+    template_name = (
+        "blog/comment_confirm_delete.html"  # A confirmation page for deleting comments
+    )
     success_url = reverse_lazy("post_list")
 
     def test_func(self):
