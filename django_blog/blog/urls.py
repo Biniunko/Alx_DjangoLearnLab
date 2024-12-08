@@ -23,14 +23,7 @@ urlpatterns = [
         "posts/<int:pk>/", PostDetailView.as_view(), name="post-detail"
     ),  # View individual post details
     path("posts/new/", PostCreateView.as_view(), name="post-create"),  # Create new post
-    path(
-        "posts/<int:pk>/edit/", PostUpdateView.as_view(), name="post-update"
-    ),  # Edit existing post
-    path(
-        "posts/<int:pk>/delete/", PostDeleteView.as_view(), name="post-delete"
-    ),  # Delete a post
-    # blog/urls.py
-
+    
     path('post/new/', views.create_post, name='create_post'),  # For creating a new post
     path('post/<int:pk>/update/', views.update_post, name='update_post'),  # For updating an existing post
     path('post/<int:pk>/delete/', views.delete_post, name='delete_post'),  # For deleting a post
