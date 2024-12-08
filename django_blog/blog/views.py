@@ -219,3 +219,99 @@ def posts_by_tag(request, tag_name):
     return render(
         request, "blog/posts_by_tag.html", {"posts": posts, "tag_name": tag_name}
     )
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "blog/comment_form.html"  # This is a separate template for comment creation
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs["pk"])  # Post ID passed in URL
+        form.instance.post = post
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("post_detail", kwargs={"pk": self.kwargs["pk"]})
+
+
+# Update view to edit a comment (only the author can edit)
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "blog/comment_form.html"  # Use the same form template as create view
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author  # Only the author can edit
+
+    def get_success_url(self):
+        return reverse_lazy("post_detail", kwargs={"pk": self.object.post.pk})
+
+
+# Delete view to delete a comment (only the author can delete)
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = "blog/comment_confirm_delete.html"  # A confirmation page for deleting comments
+    success_url = reverse_lazy("post_list")
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author  # Only the author can delete
+
+
+def home(request):
+    posts = Post.objects.all()
+    return render(request, "blog/home.html", {"posts": posts})
+
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    comments = post.comments.all()
+    comment_form = CommentForm()
+
+    if request.method == "POST" and request.user.is_authenticated:
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect("post_detail", pk=post.pk)
+
+    return render(
+        request,
+        "blog/post_detail.html",
+        {"post": post, "comments": comments, "comment_form": comment_form},
+    )
+
+
+@login_required
+def edit_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    if request.user != comment.author:
+        raise Http404
+
+    if request.method == "POST":
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect("post_detail", pk=comment.post.pk)
+    else:
+        form = CommentForm(instance=comment)
+
+    return render(request, "blog/edit_comment.html", {"form": form})
+
+
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    if request.user != comment.author:
+        raise Http404
+
+    if request.method == "POST":
+        comment.delete()
+        return redirect("post_detail", pk=comment.post.pk)
+
+    return render(request, "blog/delete_comment.html", {"comment": comment})
