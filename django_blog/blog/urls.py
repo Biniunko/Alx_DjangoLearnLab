@@ -35,10 +35,36 @@ urlpatterns = [
     path("tags/<str:tag_name>/", views.posts_by_tag, name="posts_by_tag"),
     path("post/<int:pk>/", views.post_detail, name="post_detail"),
 ]
+
 urlpatterns = [
-    path('post/<int:pk>/', views.post_detail, name='post_detail'),
-    path('post/<int:pk>/comment/new/', views.CommentCreateView.as_view(), name='comment_create'),
-    path('comment/<int:pk>/edit/', views.CommentUpdateView.as_view(), name='comment_edit'),
+    # URL for viewing all posts
+    path('posts/', views.PostListView.as_view(), name='post_list'),
+
+    # URL for viewing a single post's details, including comments
+    path('post/<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
+
+    # URL for creating a new post
+    path('post/new/', views.PostCreateView.as_view(), name='post_create'),
+
+    # URL for editing a post
+    path('post/<int:pk>/update/', views.PostUpdateView.as_view(), name='post_update'),
+
+    # URL for deleting a post
+    path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
+
+    # URL for creating a comment on a post
+    path('post/<int:pk>/comments/new/', views.CommentCreateView.as_view(), name='comment_create'),
+
+    # URL for updating a comment
+    path('comment/<int:pk>/update/', views.CommentUpdateView.as_view(), name='comment_update'),
+
+    # URL for deleting a comment
     path('comment/<int:pk>/delete/', views.CommentDeleteView.as_view(), name='comment_delete'),
-    # Your other URL patterns...
+
+    # URL for searching posts
+    path('search/', views.search, name='search'),
+
+    # URL for viewing posts by a specific tag
+    path('tags/<str:tag_name>/', views.posts_by_tag, name='posts_by_tag'),
 ]
+
