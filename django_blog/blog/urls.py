@@ -31,12 +31,14 @@ urlpatterns = [
 ]
 
 urlpatterns = [
-    path("comments/<int:pk>/edit/", views.edit_comment, name="edit_comment"),
-    path("comments/<int:pk>/delete/", views.delete_comment, name="delete_comment"),
-]
-
-urlpatterns = [
     path("search/", views.search, name="search"),
     path("tags/<str:tag_name>/", views.posts_by_tag, name="posts_by_tag"),
     path("post/<int:pk>/", views.post_detail, name="post_detail"),
+]
+urlpatterns = [
+    path('post/<int:pk>/', views.post_detail, name='post_detail'),
+    path('post/<int:pk>/comment/new/', views.CommentCreateView.as_view(), name='comment_create'),
+    path('comment/<int:pk>/edit/', views.CommentUpdateView.as_view(), name='comment_edit'),
+    path('comment/<int:pk>/delete/', views.CommentDeleteView.as_view(), name='comment_delete'),
+    # Your other URL patterns...
 ]
