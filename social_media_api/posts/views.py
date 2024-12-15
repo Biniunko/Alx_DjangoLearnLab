@@ -44,7 +44,6 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = PostFilter
 
-
 class FeedView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -54,7 +53,6 @@ class FeedView(generics.ListAPIView):
         # Assuming 'following' is a ManyToMany field on the User's Profile
         followed_users = user.profile.following.all()
         return Post.objects.filter(author__in=followed_users).order_by("-created_at")
-
 class LikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -82,3 +80,6 @@ class UnlikePostView(APIView):
             return Response({"message": "Post unliked."}, status=status.HTTP_200_OK)
         except Like.DoesNotExist:
             return Response({"error": "You have not liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    following = models.ManyToManyField(User, related_name='followers', blank=True)
