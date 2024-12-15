@@ -132,19 +132,44 @@ class LikePostView(generics.GenericAPIView):
         return Response({"detail": "Post liked."}, status=status.HTTP_201_CREATED)
 
 
+
+class LikePostView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
+
+        # Ensure the user hasn't already liked the post
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        if not created:
+            return Response({'detail': 'You have already liked this post.'}, status=400)
+
+        # Create a notification for the post's author
+        notification = Notification.objects.create(
+            recipient=post.author,
+            actor=request.user,
+            verb="liked",
+            target_content_type=ContentType.objects.get_for_model(post),
+            target_object_id=post.id,
+            target=post
+        )
+
+        return Response({'detail': 'Post liked.'}, status=201)
+
+
 class UnLikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, post_id):
-        post = Post.objects.get(id=post_id)
-        like = Like.objects.filter(post=post, user=request.user).first()
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
+
+        # Check if the user has liked the post
+        like = Like.objects.filter(user=request.user, post=post).first()
         if not like:
-            return Response(
-                {"detail": "You have not liked this post."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({'detail': 'You have not liked this post.'}, status=400)
 
         like.delete()
 
-        # Optionally, create a notification for unliking the post
-        return Response({"detail": "Post unliked."}, status=status.HTTP_200_OK)
+        # Optionally, you can add a notification for unliking the post here
+        return Response({'detail': 'Post unliked.'}, status=200)
