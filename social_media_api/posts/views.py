@@ -47,10 +47,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class FeedView(generics.ListAPIView):
     serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        followed_users = user.following.all()
+        # Assuming 'following' is a ManyToMany field on the User's Profile
+        followed_users = user.profile.following.all()
         return Post.objects.filter(author__in=followed_users).order_by("-created_at")
 
 class LikePostView(APIView):
