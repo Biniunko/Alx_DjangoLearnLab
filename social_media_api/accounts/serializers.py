@@ -26,4 +26,5 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class MySerializer(serializers.Serializer):
-    username = seriali
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True)
