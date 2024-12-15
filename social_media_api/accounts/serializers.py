@@ -19,7 +19,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password']
         )
-        # Create and return a token for the newly created user
+        # Create a token for the user after registration
         Token.objects.create(user=user)
         return user
 
@@ -32,10 +32,11 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, attrs):
         username = attrs.get('username')
         password = attrs.get('password')
-        
-        # Authenticate user
+
+        # Authenticate the user
         user = authenticate(username=username, password=password)
-        if user:
+        if user is not None:
             attrs['user'] = user
             return attrs
+
         raise serializers.ValidationError("Invalid credentials")
