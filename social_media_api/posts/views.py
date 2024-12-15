@@ -9,7 +9,51 @@ from rest_framework.response import Response
 from .models import Post
 from .serializers import PostSerializer
 from django.contrib.contenttypes.models import ContentType
+from rest_framework import generics
+from django.shortcuts import get_object_or_404
+from .models import Post, Like
+from notifications.models import Notification
 
+class LikePostView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
+
+        # Ensure the user hasn't already liked the post
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        if not created:
+            return Response({'detail': 'You have already liked this post.'}, status=400)
+
+        # Create a notification for the post's author
+        notification = Notification.objects.create(
+            recipient=post.author,
+            actor=request.user,
+            verb="liked",
+            target_content_type=ContentType.objects.get_for_model(post),
+            target_object_id=post.id,
+            target=post
+        )
+
+        return Response({'detail': 'Post liked.'}, status=201)
+
+
+class UnLikePostView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
+
+        # Check if the user has liked the post
+        like = Like.objects.filter(user=request.user, post=post).first()
+        if not like:
+            return Response({'detail': 'You have not liked this post.'}, status=400)
+
+        like.delete()
+
+        # Optionally, you can add a notification for unliking the post here
+        return Response({'detail': 'Post unliked.'}, status=200)
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
