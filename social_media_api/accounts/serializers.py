@@ -22,9 +22,8 @@ class UserSerializer(serializers.ModelSerializer):
         user.profile_picture = validated_data.get('profile_picture', None)
         user.save()
 
-        # Optionally, create a token here
+        # Optionally, create a token for the user
         Token.objects.create(user=user)
-
         return user
 
 class MySerializer(serializers.Serializer):
