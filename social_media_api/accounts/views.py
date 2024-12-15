@@ -60,3 +60,9 @@ class UserListView(generics.GenericAPIView):
         users = User.objects.all()  # Query all users (CustomUser)
         serializer = UserSerializer(users, many=True)  # Serialize the data
         return Response(serializer.data)  # Return the serialized data
+
+class CustomUserListView(generics.GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        users = CustomUser.objects.all()  # Query all CustomUser objects
+        serializer = CustomUserSerializer(users, many=True)  # Serialize the data
+        return Response(serializer.data)  # Return the serialized data
