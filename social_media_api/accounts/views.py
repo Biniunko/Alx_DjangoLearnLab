@@ -5,7 +5,10 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .serializers import RegisterSerializer
 from django.contrib.auth import authenticate
-
+from rest_framework import status, permissions
+from rest_framework.decorators import permission_classes
+from .models import User
+from .serializers import UserSerializer
 
 @api_view(["POST"])
 def register(request):
@@ -30,3 +33,18 @@ def login(request):
     return Response(
         {"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST
     )
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def follow_user(request, user_id):
+    user_to_follow = User.objects.get(id=user_id)
+    request.user.following.add(user_to_follow)
+    return Response({'message': f'Now following {user_to_follow.username}'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def unfollow_user(request, user_id):
+    user_to_unfollow = User.objects.get(id=user_id)
+    request.user.following.remove(user_to_unfollow)
+    return Response({'message': f'Unfollowed {user_to_unfollow.username}'}, status=status.HTTP_200_OK)
