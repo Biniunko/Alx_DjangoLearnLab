@@ -19,8 +19,11 @@ class UserSerializer(serializers.ModelSerializer):
         user.bio = validated_data.get('bio', '')
         user.profile_picture = validated_data.get('profile_picture', None)
         user.save()
-        return user
-class MySerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)
-    password = serializers.CharField(write_only=True)
 
+        # Create a token for the user
+        Token.objects.create(user=user)
+        
+        return user
+
+class MySerializer(serializers.Serializer):
+    username = seriali
