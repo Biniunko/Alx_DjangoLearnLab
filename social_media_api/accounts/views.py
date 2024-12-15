@@ -9,7 +9,7 @@ from rest_framework import status, permissions
 from rest_framework.decorators import permission_classes
 from .models import User
 from .serializers import UserSerializer
-
+from rest_framework import generics
 @api_view(["POST"])
 def register(request):
     if request.method == "POST":
@@ -48,3 +48,15 @@ def unfollow_user(request, user_id):
     user_to_unfollow = User.objects.get(id=user_id)
     request.user.following.remove(user_to_unfollow)
     return Response({'message': f'Unfollowed {user_to_unfollow.username}'}, status=status.HTTP_200_OK)
+# accounts/views.py
+
+
+
+# Example: List of all users (CustomUser)
+class UserListView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]  # Ensure the user is authenticated
+
+    def get(self, request, *args, **kwargs):
+        users = User.objects.all()  # Query all users (CustomUser)
+        serializer = UserSerializer(users, many=True)  # Serialize the data
+        return Response(serializer.data)  # Return the serialized data
