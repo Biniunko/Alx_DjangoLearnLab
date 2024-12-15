@@ -18,7 +18,7 @@ class LikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
+        post = generics.get_object_or_404(Post, pk=pk) # Use get_object_or_404 to retrieve the post by pk
 
         # Ensure the user hasn't already liked the post
         like, created = Like.objects.get_or_create(user=request.user, post=post)
@@ -43,8 +43,8 @@ class UnLikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
-
+        post = generics.get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
+        
         # Check if the user has liked the post
         like = Like.objects.filter(user=request.user, post=post).first()
         if not like:
@@ -137,7 +137,7 @@ class LikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
+        post = generics.get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
 
         # Ensure the user hasn't already liked the post
         like, created = Like.objects.get_or_create(user=request.user, post=post)
@@ -162,7 +162,7 @@ class UnLikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
+        post = generics.get_object_or_404(Post, pk=pk)  # Use get_object_or_404 to retrieve the post by pk
 
         # Check if the user has liked the post
         like = Like.objects.filter(user=request.user, post=post).first()
