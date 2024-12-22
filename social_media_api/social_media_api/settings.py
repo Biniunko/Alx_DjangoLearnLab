@@ -1,5 +1,6 @@
 from pathlib import Path
-
+import dj_database_url
+from decouple import config 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -59,10 +60,13 @@ WSGI_APPLICATION = "social_media_api.wsgi.application"
 AUTH_USER_MODEL = "accounts.CustomUser"
 
 # Database settings for PostgreSQL
+ # Make sure to import config if you are using python-decouple
+
 DATABASES = {
     "default": dj_database_url.config(
         default=config(
-            "DATABASE_URL", default="postgres://api_user:benam@0948@localhost/social_db"
+            "DATABASE_URL", 
+            default="postgres://api_user:benam@localhost:5432/social_db"  # Fixed URL
         )
     )
 }
