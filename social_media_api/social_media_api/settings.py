@@ -70,7 +70,19 @@ DATABASES = {
         )
     )
 }
+DATABASES = {
+    "default": dj_database_url.config(default=DATABASE_URL)
+}
 
+# Ensure the PORT is set explicitly if needed
+from urllib.parse import urlparse
+
+# Extract and set the port from the DATABASE_URL
+url = urlparse(DATABASE_URL)
+if url.port:
+    DATABASES["default"]["PORT"] = url.port
+else:
+    DATABASES["default"]["PORT"] = "5432" 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
